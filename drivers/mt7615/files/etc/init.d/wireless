@@ -1,0 +1,22 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2010-2014 OpenWrt.org
+
+START=49
+STOP=88
+
+EEPROM_1="/lib/firmware/mt7615.1.eeprom.bin"
+EEPROM_2="/lib/firmware/mt7615.2.eeprom.bin"
+
+FACTORY="/dev/mtd2ro"
+
+start() {
+    [ -f ${EEPROM_1}  ] || /bin/dd if=${FACTORY} of=${EEPROM_1} bs=1024 count=32
+    [ -f ${EEPROM_2}  ] || /bin/dd if=${FACTORY} of=${EEPROM_2} bs=1024 count=32 skip=32
+    /usr/sbin/modprobe mt7615
+    /sbin/mtkwifi reload
+}
+
+stop() {
+    /sbin/mtkwifi down
+    /usr/sbin/rmmod mt7615
+}
